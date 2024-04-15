@@ -1,0 +1,35 @@
+
+/* 
+ .tile {
+    transition: transform 0.3s ease-in-out;
+}
+
+.tile.new {
+    animation: growAndPop 0.3s ease-in-out forwards;
+}
+
+@keyframes growAndPop {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+} */
+
+/* 
+.new {
+    animation: pop 0.5s;
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1);
+    }
+} */
