@@ -147,9 +147,9 @@ initialSeed =
 -- Set the initial seed
 
 
-setInitialSeed : Int -> Random.Seed
-setInitialSeed s =
-    Random.initialSeed s
+randomSeed : Int -> Random.Seed
+randomSeed seed =
+    Random.initialSeed seed
 
 
 
@@ -254,13 +254,12 @@ arrowKeyDecoder =
 update : Msg -> GameState -> ( GameState, Cmd Msg )
 update msg state =
     let
-        -- Generate random row and column indices
         ( ranNum, seed ) =
             generateRandomIdx initialSeed
 
         -- Set new seed to update randomness
         newSeed =
-            setInitialSeed ranNum
+            randomSeed ranNum
     in
     -- update according to messages
     case msg of
@@ -378,13 +377,16 @@ view state =
             , style "font-size" "18px"
             , style "font-family" "Helvetica Neue, Arial, sans-serif"
             ]
-            [ text "Join numbers to get to the "
+            [ span [ style "font-weight" "bold", style "font-size" "80px", style "color" "rgb(119, 110, 101)" ] [ text "2048" ]
+            , text " "
+            , Html.br [] []
+            , text "Join numbers to get to the "
             , span [ style "font-weight" "bold" ] [ text "2048 tile!" ]
             ]
 
         -- New Game button
         , Html.button
-            [ onClick NewGame
+            [ onClick NewGame -- Emit a new game message on click of button
             , style "margin-left" "330px"
             , style "margin-bottom" "10px"
             , style "width" "120px"
@@ -429,6 +431,43 @@ view state =
                             []
                    )
             )
+        , span
+            [ style "margin-top" "40px"
+            , style "margin-right" "150px"
+            , style "color" "rgb(119, 110, 101)"
+            , style "font-size" "18px"
+            , style "width" "440px"
+
+            -- , style "display" "flex"
+            -- , style "flex-wrap" "wrap"
+            -- , style "justify-content" "center"
+            , style "align-items" "center"
+            , style "margin-left" "180px"
+            , style "font-family" "Helvetica Neue, Arial, sans-serif"
+            ]
+            [ span [ style "font-weight" "bold" ]
+                [ text "HOW TO PLAY:" ]
+            , span []
+                [ text
+                    " Use your "
+                ]
+            , span
+                [ style "font-weight" "bold" ]
+                [ text
+                    " arrow keys "
+                ]
+            , span [] [ text " to move the tiles. Tiles with the same number " ]
+            , span
+                [ style "font-weight" "bold" ]
+                [ text
+                    " merge into one "
+                ]
+            , span []
+                [ text
+                    "when they touch. Add them up to reach  "
+                ]
+            , span [ style "font-weight" "bold" ] [ text "2048!" ]
+            ]
         ]
 
 
@@ -449,8 +488,10 @@ renderTile tile =
         tileTextColor =
             if tile >= 8 then
                 "rgb(249 246 242)"
+                -- light text
 
             else
+                -- dark text
                 "rgb(119 110 101)"
 
         tileFontSize =
@@ -461,10 +502,10 @@ renderTile tile =
                 "45px"
     in
     div
-        [ style "width" "100px" -- Set width of square
-        , style "height" "100px" -- Set height of square
+        [ style "width" "100px" -- width of square
+        , style "height" "100px" -- height of square
         , style "background-color" (tileColor tile)
-        , style "margin" "5px" -- margin between tiles
+        , style "margin" "5px" -- space between tiles
         , style "display" "flex"
 
         -- center content
@@ -622,10 +663,11 @@ mergeTiles tiles =
         [ tile1, tile2 ] ->
             if tile1 == tile2 then
                 let
-                    new =
+                    sum =
                         tile1 + tile2
                 in
-                ( new, new )
+                -- Score gained is the sum of the merged tiles
+                ( sum, sum )
 
             else
                 -- This shouldn't happen
@@ -637,7 +679,7 @@ mergeTiles tiles =
 
 
 
--- Method for sliding a single row to the lef
+-- Method for sliding a single row to the left
 -- Separate the list into two lists of the first and second components
 
 
@@ -647,6 +689,7 @@ separateList list =
         -- Function to extract the first and second components from a tuple
         extractComponents : ( a, b ) -> ( List a, List b ) -> ( List a, List b )
         extractComponents ( first, second ) ( accFirst, accSecond ) =
+            -- Extract elements and put them into their own accumulator list
             ( first :: accFirst, second :: accSecond )
     in
     -- Use List.foldr to accumulate the first and second components into separate lists
@@ -709,8 +752,9 @@ slideGrid : Grid -> ( Grid, Int )
 slideGrid grid =
     let
         -- For each row, slide elements in Grid to the left
-        ( updatedRows, totalScore ) =
+        ( slidGrid, scoreFromSlide ) =
             List.foldl
+                -- function to do foldl with
                 (\row ( accGrid, accScore ) ->
                     let
                         ( slidRow, rowScore ) =
@@ -718,10 +762,12 @@ slideGrid grid =
                     in
                     ( accGrid ++ [ slidRow ], accScore + rowScore )
                 )
+                -- initial accuulators
                 ( [], 0 )
+                -- List to do foldL on
                 grid
     in
-    ( updatedRows, totalScore )
+    ( slidGrid, scoreFromSlide )
 
 
 slideLeft : GameState -> Random.Seed -> GameState
@@ -1061,8 +1107,8 @@ rowContains2048 row =
 
 
 gameWon : Grid -> Bool
-gameWon g =
-    case g of
+gameWon grid =
+    case grid of
         [] ->
             -- If reached the end without finding 2048
             False
@@ -1081,8 +1127,8 @@ gameWon g =
 
 
 rowContainsAdjacentTiles : Row -> Bool
-rowContainsAdjacentTiles r =
-    case r of
+rowContainsAdjacentTiles row =
+    case row of
         [] ->
             False
 
@@ -1104,8 +1150,8 @@ rowContainsAdjacentTiles r =
 
 
 rowsContainAdjacentTiles : Grid -> Bool
-rowsContainAdjacentTiles g =
-    List.any rowContainsAdjacentTiles g
+rowsContainAdjacentTiles grid =
+    List.any rowContainsAdjacentTiles grid
 
 
 
@@ -1113,8 +1159,8 @@ rowsContainAdjacentTiles g =
 
 
 rowContainsEmptytiles : Row -> Bool
-rowContainsEmptytiles r =
-    List.any (\tile -> tile == 0) r
+rowContainsEmptytiles row =
+    List.any (\tile -> tile == 0) row
 
 
 
@@ -1122,8 +1168,8 @@ rowContainsEmptytiles r =
 
 
 gridContainsEmptytiles : Grid -> Bool
-gridContainsEmptytiles g =
-    List.any rowContainsEmptytiles g
+gridContainsEmptytiles grid =
+    List.any rowContainsEmptytiles grid
 
 
 
@@ -1134,14 +1180,14 @@ gameLost : Grid -> Bool
 gameLost grid =
     let
         -- Check if there are adjacent/equal tiles in rows
-        rowsHaveAdjacent =
+        rowsHaveAdjacentEqual =
             rowsContainAdjacentTiles grid
 
         -- rotate grid to check if cols have adjacent/equal tiles
         rotGrid =
             rotateGridClockwise grid
 
-        colsHaveAdjacent =
+        colsHaveAdjacentEqual =
             rowsContainAdjacentTiles rotGrid
 
         -- Check if any empty tiles in the grid
@@ -1151,6 +1197,6 @@ gameLost grid =
         -- If there's no ajacent tiles that are equal in rows & columns and there's
         -- no empty tiles
         hasNoAdjacentEqualAndNoEmpty =
-            not (rowsHaveAdjacent || colsHaveAdjacent || containsEmptyTiles)
+            not (rowsHaveAdjacentEqual || colsHaveAdjacentEqual || containsEmptyTiles)
     in
     hasNoAdjacentEqualAndNoEmpty
