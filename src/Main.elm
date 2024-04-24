@@ -357,65 +357,79 @@ view state =
         , style "background-color" "rgb(250 248 239)"
         , style "padding" "10px"
         ]
+        -- Dive for scores/instructions above the board
         [ div
-            -- Score Div
-            [ style "width" "150px"
-            , style "height" "50px"
-            , style "background-color" "rgb(188 172 159)"
-            , style "color" "white"
-            , style "font-size" "20px"
-            , style "font-family" "Helvetica Neue, Arial, sans-serif"
-            , style "display" "flex"
-            , style "justify-content" "center"
-            , style "align-items" "center"
-            , style "margin-left" "300px"
-            , style "color" "rgb(238 228 218)"
-            , style "border-radius" "2px"
+            [ style "display" "flex" -- Add flexbox styles for horizontal alignment
             ]
-            [ text "SCORE: "
-            , span
-                [ style "font-weight" "bold"
-                , style "color" "white"
+            [ span
+                [ style "color" "rgb(143 122 101)"
+                , style "font-size" "18px"
+                , style "font-family" "Helvetica Neue, Arial, sans-serif"
+                , style "margin-top" "15px"
                 ]
-                [ text scoreStr ]
-            ]
-        , div
-            -- Best Score Div
-            [ style "width" "150px"
-            , style "height" "50px"
-            , style "background-color" "rgb(188 172 159)"
-            , style "color" "white"
-            , style "font-size" "20px"
-            , style "font-family" "Helvetica Neue, Arial, sans-serif"
-            , style "display" "flex"
-            , style "justify-content" "center"
-            , style "align-items" "center"
-            , style "margin-left" "300px"
-            , style "margin-top" "5px"
-            , style "color" "rgb(238 228 218)"
-            , style "border-radius" "2px"
-            ]
-            [ text "BEST:  "
-            , span
-                [ style "font-weight" "bold"
-                , style "color" "white"
+                [ span [ style "font-weight" "bold", style "font-size" "80px", style "color" "rgb(119, 110, 101)" ] [ text "2048" ]
+                , text " "
+                , Html.br [] []
+                , text "Join numbers to get to the "
+                , span [ style "font-weight" "bold" ] [ text "2048 tile!" ]
                 ]
-                [ text bestScoreStr ]
-            ]
 
-        -- Instruction text
-        , span
-            [ style "margin-bottom" "10px"
-            , style "margin-right" "150px"
-            , style "color" "rgb(143 122 101)"
-            , style "font-size" "18px"
-            , style "font-family" "Helvetica Neue, Arial, sans-serif"
-            ]
-            [ span [ style "font-weight" "bold", style "font-size" "80px", style "color" "rgb(119, 110, 101)" ] [ text "2048" ]
-            , text " "
-            , Html.br [] []
-            , text "Join numbers to get to the "
-            , span [ style "font-weight" "bold" ] [ text "2048 tile!" ]
+            -- Scores div
+            , div
+                []
+                [ div
+                    -- Score Div
+                    [ style "width" "150px"
+                    , style "height" "50px"
+                    , style "background-color" "rgb(188 172 159)"
+                    , style "color" "white"
+                    , style "font-size" "20px"
+                    , style "font-family" "Helvetica Neue, Arial, sans-serif"
+                    , style "display" "flex"
+                    , style "justify-content" "center"
+                    , style "align-items" "center"
+
+                    -- , style "margin-left" "300px"
+                    , style "color" "rgb(238 228 218)"
+                    , style "border-radius" "2px"
+                    ]
+                    [ text "SCORE: "
+                    , span
+                        [ style "font-weight" "bold"
+                        , style "color" "white"
+                        ]
+                        [ text scoreStr ]
+                    ]
+                , div
+                    -- Best Score Div
+                    [ style "width" "150px"
+                    , style "height" "50px"
+                    , style "background-color" "rgb(188 172 159)"
+                    , style "color" "white"
+                    , style "font-size" "20px"
+                    , style "font-family" "Helvetica Neue, Arial, sans-serif"
+                    , style "display" "flex"
+                    , style "justify-content" "center"
+                    , style "align-items" "center"
+
+                    -- , style "margin-bottom" "50px"
+                    -- , style "margin-left" "300px"
+                    , style "margin-top" "5px"
+
+                    -- , style "margin-bottom" "50px"
+                    , style "color" "rgb(238 228 218)"
+                    , style "border-radius" "2px"
+                    ]
+                    [ text "BEST:  "
+                    , span
+                        [ style "font-weight" "bold"
+                        , style "color" "white"
+                        ]
+                        [ text bestScoreStr ]
+                    ]
+                ]
+
+            -- Instruction text
             ]
 
         -- New Game button
@@ -471,10 +485,6 @@ view state =
             , style "color" "rgb(119, 110, 101)"
             , style "font-size" "18px"
             , style "width" "440px"
-
-            -- , style "display" "flex"
-            -- , style "flex-wrap" "wrap"
-            -- , style "justify-content" "center"
             , style "align-items" "center"
             , style "margin-left" "180px"
             , style "font-family" "Helvetica Neue, Arial, sans-serif"
