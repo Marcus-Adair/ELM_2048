@@ -45,12 +45,13 @@ gridSize =
 
 
 type alias GameState =
-    { grid : Grid
-    , score : Int
-    , won : Bool
-    , lost : Bool
-    , overlayDisplayed : Bool
-    , bestScore : Int
+    { grid : Grid -- grid of tiles
+    , score : Int -- current score of game
+    , won : Bool -- bool for whether current game state is a won game
+    , lost : Bool -- if current game state is a lost game
+    , overlayDisplayed : Bool -- if won or lost is true
+    , bestScore : Int -- Best score over mutliple games
+    , counter : Int -- counter for setting new random seed
     }
 
 
@@ -141,11 +142,11 @@ initGrid seed =
 
 initialSeed : Random.Seed
 initialSeed =
-    Random.initialSeed 69
+    Random.initialSeed 2048
 
 
 
--- Set the initial seed
+-- Get a random seed
 
 
 randomSeed : Int -> Random.Seed
@@ -174,6 +175,7 @@ main =
             , lost = False
             , overlayDisplayed = False
             , bestScore = 0
+            , counter = 1
             }
     in
     Browser.element
@@ -256,12 +258,12 @@ arrowKeyDecoder =
 update : Msg -> GameState -> ( GameState, Cmd Msg )
 update msg state =
     let
-        ( ranNum, seed ) =
-            generateRandomIdx initialSeed
+        count =
+            state.counter
 
         -- Set new seed to update randomness
         newSeed =
-            randomSeed ranNum
+            randomSeed count
 
         best =
             state.bestScore
@@ -282,16 +284,20 @@ update msg state =
 
         -- on New Game button press
         NewGame ->
-            ( resetGame state best, Cmd.none )
+            ( resetGame state best count, Cmd.none )
 
 
 
 -- Reset GameState model after new button pressed
 
 
-resetGame : GameState -> Int -> GameState
-resetGame state best =
-    { grid = initGrid initialSeed, score = 0, won = False, lost = False, overlayDisplayed = False, bestScore = best }
+resetGame : GameState -> Int -> Int -> GameState
+resetGame state best count =
+    let
+        newSeed =
+            randomSeed count
+    in
+    { grid = initGrid newSeed, score = 0, won = False, lost = False, overlayDisplayed = False, bestScore = best, counter = count }
 
 
 
@@ -435,7 +441,7 @@ view state =
         -- New Game button
         , Html.button
             [ onClick NewGame -- Emit a new game message on click of button
-            , style "margin-left" "330px"
+            , style "margin-left" "325px"
             , style "margin-bottom" "10px"
             , style "width" "120px"
             , style "height" "40px"
@@ -842,14 +848,17 @@ slideLeft state seed =
             else
                 state.bestScore
 
+        countInc =
+            state.counter + 1
+
         slidGridWithNewTile =
             -- If grid is same after the slide, dont spawn new tile
             if gridEqual state.grid slidGrid then
-                { grid = slidGrid, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best }
+                { grid = slidGrid, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best, counter = countInc }
 
             else
                 -- spawn random tile
-                { grid = spawnRandomTile slidGrid seed, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best }
+                { grid = spawnRandomTile slidGrid seed, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best, counter = countInc }
     in
     slidGridWithNewTile
 
@@ -890,14 +899,17 @@ slideDown state seed =
             else
                 state.bestScore
 
+        countInc =
+            state.counter + 1
+
         slidGridWithNewTile =
             -- If grid is same after the slide, dont spawn new tile
             if gridEqual state.grid slidGrid then
-                { grid = slidGrid, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best }
+                { grid = slidGrid, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best, counter = countInc }
 
             else
                 -- spawn random tile
-                { grid = spawnRandomTile slidGrid seed, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best }
+                { grid = spawnRandomTile slidGrid seed, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best, counter = countInc }
     in
     slidGridWithNewTile
 
@@ -935,13 +947,17 @@ slideRight state seed =
             else
                 state.bestScore
 
+        countInc =
+            state.counter
+                + 1
+
         slidGridWithNewTile =
             -- If grid is same after the slide, dont spawn new tile
             if gridEqual state.grid slidGrid then
-                { grid = slidGrid, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best }
+                { grid = slidGrid, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best, counter = countInc }
 
             else
-                { grid = spawnRandomTile slidGrid seed, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best }
+                { grid = spawnRandomTile slidGrid seed, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best, counter = countInc }
     in
     slidGridWithNewTile
 
@@ -979,14 +995,17 @@ slideUp state seed =
             else
                 state.bestScore
 
+        countInc =
+            state.counter + 1
+
         slidGridWithNewTile =
             -- If grid is same after the slide, dont spawn new tile
             if gridEqual state.grid slidGrid then
-                { grid = slidGrid, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best }
+                { grid = slidGrid, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best, counter = countInc }
 
             else
                 -- spawn random tile
-                { grid = spawnRandomTile slidGrid seed, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best }
+                { grid = spawnRandomTile slidGrid seed, score = newScore, won = won, lost = lost, overlayDisplayed = overlay, bestScore = best, counter = countInc }
     in
     slidGridWithNewTile
 
